@@ -1,5 +1,6 @@
 "use server";
 
+import { ActionState, actionStateFilter } from "@/lib/action-state-filter";
 import { POSTS } from "@/lib/path";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -11,7 +12,7 @@ const createPostSchema = z.object({
 });
 
 export const createPost = async (
-  _actionState: { message: string; payload?: FormData },
+  _actionState: ActionState,
   formData: FormData,
 ) => {
   try {
@@ -30,6 +31,6 @@ export const createPost = async (
     revalidatePath(POSTS);
     return { message: "Post Create" };
   } catch (error) {
-    return { message: "Something went wrong", payload: formData };
+    return actionStateFilter(error, formData);
   }
 };
